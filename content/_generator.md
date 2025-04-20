@@ -12,7 +12,7 @@ aliases = [
 
 # Collektive: Aggregate programming in Kotlin Multiplatform
 
-### [Danilo Pianini --- danilo.pianini@unibo.it](danilo.pianini@unibo.it)
+### [Danilo Pianini --- danilo.pianini@unibo.it](mailto:danilo.pianini@unibo.it)
 
 #### Seminar in "Programmazione di Sistemi Mobile" @ Università di Torino
 
@@ -22,19 +22,229 @@ aliases = [
 
 ---
 
-## Aggregate programming, the idea
+## Target systems
 
-* classi di sistemi affrontati
-* approcci self-org
-* problemi di scala
-* approccio basato sui linguaggi
-* concetto di campo computazionale
+{{% multicol %}}{{% col %}}
+![AI-generated target system](target%20system.png)
+{{% /col %}}{{% col %}}
+
+* *Networked* systems
+* *Heterogeneous* devices
+* *Unreliable communication*
+* No topology assumptions
+  * Usually, the worst case is a *mesh-like topology* with *no clear coordinator*
+  * the topology *changes dynamically*
+* Devices are possibly *situated*
+* Possibly multiple network technologies to be used opportunistically
+  * (e.g., bluetooth, wifi, 5g, etc.)
+  
+{{% /col %}}{{% /multicol %}}
 
 ---
 
-## A brief history of aggregate programming languages
 
-* finisce con tabella riassuntiva
+<video width="120%" height="120%" autoplay controls loop><source data-src="https://danysk.github.io/Slides-2019-OYM/video/stampede.mp4" type="video/webm" /></video>
+
+---
+
+## Self-organising systems
+
+One way to tackle these challenges is through systems that *self-organise*.
+
+* *Self-organisation* is a process in which a system spontaneously organizes itself into a structured state without external control.
+* It is a **bottom-up** process, where local interactions between components lead to the **emergence** of global patterns or structures.
+* Self-organisation is often observed in *natural systems*, such as biological organisms, ecosystems, and social systems.
+* It can also be applied to artificial systems, such as robotics, distributed computing, and complex networks.
+
+---
+
+<div id="div1" style="width: 720px; float: left; overflow: hidden;">
+  <img src="https://danysk.github.io/Slides-2019-OYM/img/ants.jpg" style="position:relative; width: 100%; height: 100%; border: 0; margin:auto; overflow: hidden;"/>
+</div>
+<div id="div2" style="width: 720px; float: left; overflow: hidden;">
+  <img src="https://danysk.github.io/Slides-2019-OYM/img/termites.jpg" style="position:relative; width: 100%; height: 100%; border: 0; margin:auto; overflow: hidden;"/>
+</div>
+<div id="div3" style="width: 720px; float: left; overflow: hidden;">
+  <img src="https://danysk.github.io/Slides-2019-OYM/img/firefly.jpg" style="position:relative; width: 100%; height: 100%; border: 0; margin:auto; overflow: hidden;"/>
+</div>
+<div id="div4" style="width: 720px; float: left; overflow: hidden;">
+  <img src="https://danysk.github.io/Slides-2019-OYM/img/ecosystem.jpg" style="position:relative; width: 100%; height: 100%; border: 0; margin:auto; overflow: hidden;"/>
+</div>
+
+---
+
+<iframe
+width="1920" height="950"
+src="https://www.youtube.com/embed/ZHpu7ngQxwE?si=YPGltxUIp5QtcOlV"
+autoplay="true"
+title="YouTube video player"
+frameborder="0"
+allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+referrerpolicy="strict-origin-when-cross-origin"
+allowfullscreen>
+</iframe>
+
+---
+
+## Engineering self-organisation
+
+* Self-organisation is **very hard to engineer**
+* The system properties are built **bottom-up** from **local interactions**
+* Even worse, even when a self-org system has been built and verified,
+it is extremely hard to **reuse** it in a different context
+
+### Where is the *engineering*?
+
+There are properties that we cannot renounce:
+* *Top-down design*
+* *Modularity*
+* *Reusability*
+* *Composability*
+* *Scalability*
+* *Maintainability*
+
+---
+
+## Aggregate programming, the idea
+
+We have a tool that is *natively modular* and *natively composable*:
+### **functional programming languages**.
+
+What if we find a set of abstractions compatible with *functional programming*
+that allow us to build self-organising systems?
+
+### Aggregate programming, originally:
+
+* The computational machine is the entire system
+* Data items are a *fields*
+    * A map from *devices* to *values*
+* Basic operations:
+    * evolution in time: `rep`
+    * perception of the surroundings (neighboring field): `nbr`
+    * distributed branching (domain segmentation): `if`
+
+---
+
+# A brief history of aggregate programming languages
+
+---
+
+## MIT Proto, 2006
+
+![MIT Proto](https://raw.githubusercontent.com/jakebeal/MIT-Proto/refs/heads/master/webproto/figures/protorunning.png)
+
+The precursor of aggregate programming,
+based on the idea of *amorphus computing*.
+
+* Originally developed at the MIT by Jonathan Bachrach and Jake Beal
+* C++ with built-in OpenGL visualisation
+* LISP-like syntax
+* Re-implemented in Javascript as WebProto
+* Discontinued in 2016 in favour of Protelis
+
+```lisp
+(def gradient (src)
+   (letfed ((n infinity (mux src 0 (min-hood (+ (nbr n) (nbr-range))))))
+      n))
+```
+
+---
+
+## [Protelis, 2015](https://protelis.github.io/)
+
+<video width="1080" height="450" autoplay controls loop><source data-src="https://protelis.github.io/images/mapehd-small-h264.mp4" type="video/webm" /></video>
+
+The first higher-order aggregate programming language.
+
+{{% multicol %}}{{% col %}}
+
+```python
+def distanceTo(source) {
+  share (distance <- POSITIVE_INFINITY) {
+    mux (source) {
+      0
+    } else {
+      foldMin(POSITIVE_INFINITY, distance + self.nbrRange())
+    }
+  }
+}
+
+```
+
+{{% /col %}}{{% col %}}
+
+* Originally developed at BBN Technologies and the University of Bologna primarily by Danilo Pianini
+    * with support from Jake Beal and Mirko Viroli
+* Stand-alone, JVM-based, Java-interoperable domain-specific language
+    * Based on [Xtext](https://eclipse.dev/Xtext/)
+    * *weakly typed*
+* Introduces the higher-order field calculus
+* Actively maintained, but feature-frozen
+
+{{% /col %}}{{% /multicol %}}
+
+
+---
+
+## [ScaFi (Scala Fields), 2016](https://scafi.github.io/)
+
+The first *internal DSL* implementing aggregate programming.
+
+* Originally developed at the University of Bologna by Mirko Viroli and Roberto Casadei
+* Internal DSL written in Scala 2
+* Strongly typed, uses the Scala 2 type system natively
+* JVM and JS versions
+* Different semantics: *partial alignment*, *non-reified fields*
+* Actively maintained, but feature-frozen (Scafi 3 based on Scala 3 is under development)
+
+```scala
+def distanceTo(source: Boolean): Double = {
+  rep(Double.PositiveInfinity) (d => {
+    mux (source) {
+      0.0
+    } {
+      foldHoodPlus(Double.PositiveInfinity)(Math.min) { nbr(d) + nbrvar[Double]("nbrRange") }
+    }
+  })
+}
+```
+
+---
+
+## [FCPP, 2019](https://scafi.github.io/)
+
+The first *native* (C++14) implementation of aggregate programming.
+
+* Originally developed at the University of Turin by Giorgio Audrito
+* Very high performance
+* C++14 library
+* *Manually aligned* via macros
+* Can work on resource-restricted devices
+
+```cpp
+DEF() double abf(ARGS, bool source) { CODE
+  return nbr(CALL, INF, [&] (field<double> d) {
+    double v = source ? 0.0 : INF;
+    return min_hood(CALL, d + node.nbr_dist(), v);
+  });
+}
+```
+---
+
+## What is missing?
+
+| Properties            | Protelis      | ScaFi         | FCPP          |
+|-----------------------|---------------|---------------|---------------|
+| JVM compatibility     | {{< tick >}}  | {{< tick >}}  | {{< cross >}} |
+| Android compatibility | ~             | ~             | {{< cross >}} |
+| JS compatibility      | {{< cross >}} | {{< tick >}}  | {{< cross >}} |
+| Native compatibility  | {{< cross >}} | {{< cross >}} | {{< tick >}}  |
+| iOS compatibility     | {{< cross >}} | {{< cross >}} | {{< cross >}} |
+| Strictly typed        | {{< cross >}} | {{< tick >}}  | {{< tick >}}  |
+| Transparent alignment | {{< tick >}}  | {{< cross >}} | {{< cross >}} |
+| Complete alignment    | {{< tick >}}  | {{< cross >}} | {{< tick >}}  |
+| Exchange support      | ~             | {{< cross >}} | {{< tick >}}  |
+| Reified fields        | {{< tick >}}  | {{< cross >}} | {{< tick >}}  |
 
 ---
 
@@ -42,6 +252,20 @@ aliases = [
 
 * tabella con colonna di collektive
 * perché Kotlin
+
+| Properties            | Protelis      | ScaFi         | FCPP          | Collektive   |
+|-----------------------|---------------|---------------|---------------|--------------|
+| JVM compatibility     | {{< tick >}}  | {{< tick >}}  | {{< cross >}} | {{< tick >}} |
+| Android compatibility | ~             | ~             | {{< cross >}} | {{< tick >}} |
+| JS compatibility      | {{< cross >}} | {{< tick >}}  | {{< cross >}} | {{< tick >}} |
+| Native compatibility  | {{< cross >}} | {{< cross >}} | {{< tick >}}  | {{< tick >}} |
+| iOS compatibility     | {{< cross >}} | {{< cross >}} | {{< cross >}} | {{< tick >}} |
+| Strictly typed        | {{< cross >}} | {{< tick >}}  | {{< tick >}}  | {{< tick >}} |
+| Transparent alignment | {{< tick >}}  | {{< cross >}} | {{< cross >}} | {{< tick >}} |
+| Complete alignment    | {{< tick >}}  | {{< cross >}} | {{< tick >}}  | {{< tick >}} |
+| Exchange support      | ~             | {{< cross >}} | {{< tick >}}  | {{< tick >}} |
+| Reified fields        | {{< tick >}}  | {{< cross >}} | {{< tick >}}  | {{< tick >}} |
+
 
 ---
 
@@ -53,9 +277,51 @@ aliases = [
 
 ---
 
-## Collektive: under the hood
+# Collektive: under the hood
 
 * general structure
+* dsl
+    * usa i tipi di Kotlin + Field, niente di esotico
+    * core (esempio gradiente)
+    * con operatori (esempio gradiente)
+* compiler plugin
+* complete transparent alignment via compiler plugin
+    * allineamento magico stesso esempio
+* bonus: static analyzer
+    * mostrare versione rep/nbr che dà warning
+* gradle plugin
+* collektivize
+* standard library
+
+---
+
+# Collektive: prototypation
+
+---
+
+* a simulator is necessary for any non trivial case
+* interno / esterno, caso di scafi e FCPP
+* collektive al momento può usare Alchemist
+* integrazione con simulatori e considerazioni ingegneristiche:
+scrivere sempre il software in modo isolato e senza fare riferimento alle astrazioni del simulatore
+così che la libreria sia "spostabile" e deployabile
+* progetto di esempio col repo di collektive-examples come punto di partenza
+* hopcount gradient
+* hopcount da libreria
+* costruire il canale con la libreria live
+* mostrare esempi più avanzati (Gianlu e Marti)
+
+---
+
+# Collektive on real world devices
+
+---
+
+* Network model
+* Android example
+
+
+---
 
 ---
 
