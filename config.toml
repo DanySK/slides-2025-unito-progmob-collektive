@@ -1,6 +1,6 @@
-baseURL = "https://danysk.github.io/Template-Hugo-Reveal-Slides"
+baseURL = "https://danysk.github.io/slides-2025-unito-progmob-collektive"
 languageCode = "en-us"
-title = "A Hugo theme for creating Reveal.js presentations"
+title = "Collektive: Aggregate programming in Kotlin Multiplatform"
 disableKinds = ["sitemap", "RSS"]
 theme = "reveal-hugo"
 publishDir = "build"

@@ -1,5 +1,7 @@
 ## How to run slides
 
+Served at https://danysk.github.io/slides-2025-unito-progmob-collektive/
+
 ### Linux
 
 ```bash

@@ -10,6 +10,54 @@ aliases = [
 
 +++
 
+# Collektive: Aggregate programming in Kotlin Multiplatform
+
+### [Danilo Pianini --- danilo.pianini@unibo.it](danilo.pianini@unibo.it)
+
+#### Seminar in "Programmazione di Sistemi Mobile" @ Università di Torino
+
+---
+
+# Introduction
+
+---
+
+## Aggregate programming, the idea
+
+* classi di sistemi affrontati
+* approcci self-org
+* problemi di scala
+* approccio basato sui linguaggi
+* concetto di campo computazionale
+
+---
+
+## A brief history of aggregate programming languages
+
+* finisce con tabella riassuntiva
+
+---
+
+## Why Collektive
+
+* tabella con colonna di collektive
+* perché Kotlin
+
+---
+
+# Collektive: how it feels
+
+---
+
+## A few algorithms you have seen in previous classes
+
+---
+
+## Collektive: under the hood
+
+* general structure
+
+---
 
 # Short guide to Markdown slides
 
