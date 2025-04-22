@@ -358,6 +358,30 @@ Collektive used Kotlin to do so as:
 
 ## A few algorithms you have seen in previous classes
 
+### Adaptive Bellman-Ford (hop count)
+
+```kotlin
+fun <ID: Any> Aggregate<ID>.distanceTo(source: Boolean) = share(Double.POSITIVE_INFINITY) { distances ->
+    when {
+        source -> 0.0
+        else -> distances.minValue(Double.POSITIVE_INFINITY) + 1
+    }
+}
+```
+
+### Adaptive Bellman-Ford (with metric)
+
+
+```kotlin
+fun <ID: Any> Aggregate<ID>.distanceTo(source: Boolean, metric: Field<ID, Double>) =
+    share(Double.POSITIVE_INFINITY) { distances ->
+        when {
+            source -> 0.0
+            else -> (distances + metric).minValue(Double.POSITIVE_INFINITY)
+        }
+    }
+```
+
 ---
 
 # Collektive: under the hood
