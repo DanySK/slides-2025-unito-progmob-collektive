@@ -190,6 +190,23 @@ def distanceTo(source) {
 
 The first *internal DSL* implementing aggregate programming.
 
+<img src="https://user-images.githubusercontent.com/23448811/224012411-fbef5948-c546-49fa-b411-f5662831ef1b.gif" width="500px">
+
+{{% multicol %}}{{% col %}}
+
+```scala
+def distanceTo(source: Boolean): Double =
+  rep(Double.PositiveInfinity) (d => {
+    mux (source) { 0.0 } {
+      foldHoodPlus(Double.PositiveInfinity)(Math.min) {
+        nbr(d) + nbrRange
+      }
+    }
+  })
+```
+
+{{% /col %}}{{% col %}}
+
 * Originally developed at the University of Bologna by Mirko Viroli and Roberto Casadei
 * Internal DSL written in Scala 2
 * Strongly typed, uses the Scala 2 type system natively
@@ -197,29 +214,17 @@ The first *internal DSL* implementing aggregate programming.
 * Different semantics: *partial alignment*, *non-reified fields*
 * Actively maintained, but feature-frozen (Scafi 3 based on Scala 3 is under development)
 
-```scala
-def distanceTo(source: Boolean): Double = {
-  rep(Double.PositiveInfinity) (d => {
-    mux (source) {
-      0.0
-    } {
-      foldHoodPlus(Double.PositiveInfinity)(Math.min) { nbr(d) + nbrvar[Double]("nbrRange") }
-    }
-  })
-}
-```
+{{% /col %}}{{% /multicol %}}
 
 ---
 
 ## [FCPP, 2019](https://scafi.github.io/)
 
+<img src="https://fcpp.github.io/assets/static/screenshot.png" width="500px">
+
 The first *native* (C++14) implementation of aggregate programming.
 
-* Originally developed at the University of Turin by Giorgio Audrito
-* Very high performance
-* C++14 library
-* *Manually aligned* via macros
-* Can work on resource-restricted devices
+{{% multicol %}}{{% col %}}
 
 ```cpp
 DEF() double abf(ARGS, bool source) { CODE
@@ -229,6 +234,18 @@ DEF() double abf(ARGS, bool source) { CODE
   });
 }
 ```
+
+{{% /col %}}{{% col %}}
+
+
+* Originally developed at the University of Turin by Giorgio Audrito
+* Very high performance
+* C++14 library
+* *Manually aligned* via macros
+* Can work on resource-restricted devices
+
+{{% /col %}}{{% /multicol %}}
+
 ---
 
 ## What is missing?
@@ -248,10 +265,76 @@ DEF() double abf(ARGS, bool source) { CODE
 
 ---
 
+## A matter of trade-offs
+
+*Internal* DSLs have several desirable features:
+
+* They are *easier to maintain*, as the syntax, compiler, and tooling are shared with the host language
+* They are more *familiar* to mainstream programmers
+    * no need to learn an entire new language, it is just a library
+* They can use types from the host language
+
+but they also have some critical issues:
+* Their *syntax is restricted* to valid fragments in the host language
+* Language-level mechanisms, such as **alignment**, may "boil" up to the surface, making the language pleasant
+    * and *violating information hiding*
+
+---
+
+## Alignment, in short
+
+![](align.svg)
+
+structurally-equal programs *can communicate*
+
+---
+
+## Alignment, in short
+
+![](dealign.svg)
+
+branching must break alignment
+
+---
+
+## Alignment when programming
+
+* Alignment is a **low-level mechanism** and as such should be **hidden** when writing aggregate code
+    * Just as memory references are hidden when you program in Kotlin or Java
+* Implementing alignment requires maintaining your own stack, so that when a communication act happens
+the information can be associated to the stack frame
+
+Different frameworks make different choices:
+* **Protelis** hides alignment under the hood
+    * It can do so because it is an *external* DSL whose interpreter has been realized from zero
+* **Scafi** makes several compromises to align
+    * Fields are *not reified*, namely, operations of fields can be executed in dedicated contexts (`foldHood`)
+    but there is no way to have a `Field`-typed object
+    * Similar programs that should not align may align in Scafi (*weak alignment*)
+    * Functions are aligned via a stack lookup (`aggregate` function), exposing a low-level mechanism and compromising performance
+* **FCPP** relies on *C macros* to align
+    * Alignment is *not transparent*
+
+---
+
 ## Why Collektive
 
-* tabella con colonna di collektive
-* perché Kotlin
+
+<img src="https://github.com/Collektive/collektive/raw/master/site/static/img/collektive-logo.svg" width="300px">
+
+Collekive answers the question:
+
+> what if we modify the host language compiler to align code strongly and transparently?
+
+Collektive used Kotlin to do so as:
+1. Kotlin is becoming a reference language for mobile programming (Android is Kotlin-first)
+2. Kotlin is modern and supports nice-looking DSLs
+3. The Kotlin compiler can be enriched via *plugins*
+4. Kotlin is multiplatform, generating bindings for the JVM, native (incl. iOS), JS, and WASM
+
+---
+
+## Collektive goals
 
 | Properties            | Protelis      | ScaFi         | FCPP          | Collektive   |
 |-----------------------|---------------|---------------|---------------|--------------|

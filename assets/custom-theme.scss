@@ -267,13 +267,13 @@ kbd {
 }
 
 .reveal .slide-background:after {
-	content: "Danilo Pianini - Collektive: Aggregate programming in Kotlin Multiplatform - ProgMob 2025 @ UniTo";
+	content: "D. Pianini - Collektive @ ProgMob 2025, UniTo";
 	position: absolute;
-	bottom: 2.5%;
-	right: 6%;
+	bottom: 1.5%;
+	right: 4%;
 	z-index: -1;
 	color: $detailBackgroundColor;
-	font-size: .8em;
+	font-size: 10px;
   }
 
 
