@@ -319,7 +319,6 @@ Different frameworks make different choices:
 
 ## Why Collektive
 
-
 <img src="https://github.com/Collektive/collektive/raw/master/site/static/img/collektive-logo.svg" width="300px">
 
 Collekive answers the question:
@@ -362,12 +361,15 @@ Collektive used Kotlin to do so as:
 
 ```kotlin
 fun <ID: Any> Aggregate<ID>.distanceTo(source: Boolean) = share(Double.POSITIVE_INFINITY) { distances ->
+    val throughNeighbor = distances.minValue(Double.POSITIVE_INFINITY) + 1
     when {
         source -> 0.0
-        else -> distances.minValue(Double.POSITIVE_INFINITY) + 1
+        else -> throughNeighbor
     }
 }
 ```
+
+(what happens if we move `throughNeighbor` inside the `when`?)
 
 ### Adaptive Bellman-Ford (with metric)
 
@@ -375,9 +377,10 @@ fun <ID: Any> Aggregate<ID>.distanceTo(source: Boolean) = share(Double.POSITIVE_
 ```kotlin
 fun <ID: Any> Aggregate<ID>.distanceTo(source: Boolean, metric: Field<ID, Double>) =
     share(Double.POSITIVE_INFINITY) { distances ->
+        val throughNeighbor = (distances + metric).minValue(Double.POSITIVE_INFINITY)
         when {
             source -> 0.0
-            else -> (distances + metric).minValue(Double.POSITIVE_INFINITY)
+            else -> throughNeighbor
         }
     }
 ```
