@@ -1,8 +1,8 @@
 
 +++
 
-title = "Guide for writing markdown slides"
-description = "A Hugo theme for creating Reveal.js presentations"
+title = "Collektive: Aggregate programming in Kotlin Multiplatform"
+description = "Collektive: Aggregate programming in Kotlin Multiplatform"
 outputs = ["Reveal"]
 aliases = [
     "/progmob/"
@@ -369,10 +369,10 @@ fun <ID: Any> Aggregate<ID>.distanceTo(source: Boolean) = share(Double.POSITIVE_
 }
 ```
 
-(what happens if we move `throughNeighbor` inside the `when`?)
+* what happens if we move `throughNeighbor` inside the `when`?
+* what happens if we use `Int`s or `Long`s instead of `Double`s?
 
-### Adaptive Bellman-Ford (with metric)
-
+### Adaptive Bellman-Ford (with custom metric)
 
 ```kotlin
 fun <ID: Any> Aggregate<ID>.distanceTo(source: Boolean, metric: Field<ID, Double>) =
@@ -387,18 +387,224 @@ fun <ID: Any> Aggregate<ID>.distanceTo(source: Boolean, metric: Field<ID, Double
 
 ---
 
+### Adaptive Channel
+
+TODO
+
+---
+
 # Collektive: under the hood
 
-* general structure
-* dsl
-    * usa i tipi di Kotlin + Field, niente di esotico
-    * core (esempio gradiente)
-    * con operatori (esempio gradiente)
-* compiler plugin
-* complete transparent alignment via compiler plugin
-    * allineamento magico stesso esempio
-* bonus: static analyzer
-    * mostrare versione rep/nbr che dà warning
+---
+
+## General structure
+
+* **Domain-Specific Language**
+    * *Base abstractions*
+        * `Field`
+        * `Aggregate`
+        * `PurelyLocal`
+        * `project(Field)`
+    * *Core Machinery*
+        * Interpreter implementation
+        * Network stub
+    * Compiled with the **Compiler Plugin** using the **Gradle Plugin**
+* **Compiler Plugin**
+    * Requires the *Base Abstractions*
+* **Gradle Plugin**
+    * Applies the **Compiler plugin** to any project
+* **Collektivize**
+    * A Gradle plugin that generates "fielded" methods automatically
+* **Standard Library**
+    * Compiled with the **Compiler Plugin** using the **Gradle Plugin**
+      * Functions for common operations
+      * Uses **Collektivize** to "field" the Kotlin standard library
+
+---
+
+## Domain-specific language
+
+Collektive introduces the following important abstractions:
+* `Field`: a view of a value, enclosing is local value and the neighboring values
+    * fields can be manipulated using `map` and combined with `alignedMap`
+    * fields can be converted into Kotlin `Map`s, using `toMap` or `excludeSelf`
+    * fields can be converted to "scalar" values using `fold` and `reduce` operations
+* `Aggregate`: the context of aggregate operations. Provides (internally or through extension functions)
+    * (*Core operation*) `alignedOn(pivot: Any?, () -> Result): Result`
+        * aligns the code on the given pivot and runs the provided operation
+    * (*Core operation*) `exchanging(initial: Shared, body: YieldingScope<Field<ID, Shared>, Returned>): Field<ID, Shared>` 
+        * generalized form of `exchange` that shares a value and can return arbitrary values
+        * all other operators except `alignedOn` could be rewritten in terms of `exchanging`, but it would be inefficient
+    * `exchange(initial: Shared, body: (Field<ID, Shared>) -> Field<ID, Shared>): Field<ID, Shared>`
+        * `exchange` shares a value, computes over the neighborhood view of such value,
+          and returns a `Field` whose contents are sent back to every neighbor
+    * (*Core operation*) `neighboring(local: Shared): Field<ID, Shared>`
+        * Provided a value, builds the neighboring view of such value
+    * `mapNeighborhood(local: (ID) -> T): Field<ID, T>`
+        * Maps every surrounding device, provided its identifier, to a value
+    * `share(initial: Shared, body: (Field<ID, Shared>) -> Shared): Shared`
+        * simplified version of `exchange` that sends the same value to all neighbors
+    * `sharing(initial: Shared, body: YieldingScope<Field<ID, Shared>, Returned>) -> YieldingResult<Shared, Returned>): Returned`
+        * generalized version of `share` that can return arbitrary values
+    * `evolve(initial: Stored, transform: (Stored) -> Stored): Stored`
+        * evolves a value in time, starting from `initial` and computing `transform` at each round
+    * (*Core operation*) `evolving(initial: Stored, transform: YieldingScope<Stored, Returned>): Returned`
+        * generalized version of `evolve`, returning a `Result`
+
+---
+
+## Domain-specific language
+
+Collektive is designed for the aggregate code to meld into Kotlin natively.
+Names have been selected favoring a Kotlin-friendly syntax instead of the literature terms.
+
+| **Literature**   | **Collektive** |
+|------------------|----------------|
+| `rep`            | `evolve`       |
+| `nbr`            | `neighboring`  |
+| `share`          | `share`        |
+| `xc`             | `exchange`     |
+
+All computations use Kotlin's native types.
+* With one caveat: types used in aggregate operations must be `@Serializable`
+    * Under the hood, Collektive uses `kotlinx.serialization` to serialize the data
+
+---
+
+## Domain-specific language
+
+### Aggregate branching
+
+There is a missing item in the previous table:
+
+| **Literature** | **Collektive** |
+|----------------|----------------|
+| `rep`          | `evolve`       |
+| `nbr`          | `neighboring`  |
+| `share`        | `share`        |
+| `xc`           | `exchange`     |
+| `if`           | ????           |
+
+Branching in aggregate programming is *domain segmentation*: operations inside a branch are *aligned*
+only with the devices that are in the same branch.
+* Special problem: fields created *outside* of the branch need **projection**!
+
+```kotlin
+// Device with ID 0
+fun Aggregate<Int>.myAlignmentTest(): Unit {
+    val myField = mapNeighborhood { 1 }
+    println(myField) // φ(localId = 0, localValue = 1), neighbors = { 1 -> 1, 2 -> 1, 3 -> 1 }
+    when (localId % 2) {
+        1 -> println(myField) // Branch not taken
+        else -> {
+            println(mapNeighborhood { 2 }) // φ(localId = 0, localValue = 2), neighbors = { 2 -> 2 }
+            println(myField) // φ(localId = 0, localValue = 1), neighbors = { 2 -> 1 }
+        }
+    }
+}
+```
+
+---
+
+## Domain-specific language
+
+### The problem with a "plain" DSL
+
+If we were okay with dealing with alignment manually, we could have used a "plain" DSL.
+
+This is what a Bellman-Ford gradient would have looked like:
+
+```kotlin
+fun <ID: Any> Aggregate<ID>.distanceTo(source: Boolean, metric: Field<ID, Double>) =
+    alignedOn("Aggregate.distanceTo(Boolean)") { // We need to manually align to avoid clashing with other functions with a similar structure
+        share(Double.POSITIVE_INFINITY) { distances ->
+            alignedOn("share(Boolean)") { // We need to manually align again
+                val actualMetrics = project(metric) // The field comes from another context, hence needs projection
+                val throughNeighbor = distances.alignedMapValues(actualMetrics, Double::plus)
+                when {
+                    source -> alignedOn(true) { 0.0 }
+                    else -> alignedOn(false) { throughNeighbor } // We cannot run the computation here or the source will never send data!
+                }
+            }
+    }
+}
+```
+
+Performing alignment and projection manually is akin to managing memory manually in pure C:
+exposes a *low-level mechanism* and is *very error-prone*.
+
+* **Observation**: alignment and projections can be *automatically inferred* from the code structure!
+
+---
+
+## Reducing boilerplate a compiler plugin
+
+### Kotlin: compiler plugins
+
+The Kotlin compiler is designed to be extended via *compiler plugins*.
+* Compiler plugins are written in Kotlin and can be used to manipulate the Abstract Syntax Tree (AST) of a program.
+* Changes to the AST can alter the behavior or generate code at compile time.
+* The compiler supports *frontend* plugins for error and warning detection and *backend* plugins for code generation.
+* Rough process:
+    * Kotlin code $\Rightarrow$ compiler frontend
+    $\Rightarrow$ Intermediate Representation (IR)
+    $\Rightarrow$ compiler backend
+    $\Rightarrow$ Modified IR
+    $\Rightarrow$ Lowering
+    $\Rightarrow$ Bytecode, JavaScript, Klib, LLVM IR
+
+#### Notable examples:
+* **KotlinX serialization**
+    * KotlinX serialization is a library for serializing and deserializing Kotlin objects.
+    * Annotating a class with `@Serializable` generates a serializer for that class under the hood.
+    * Methods `serialize` and `deserialize` are generated at compile time, and appear in the IDE
+    * Collektive uses this library and plugin to deal with serialization!
+* **Power assert**
+    * Power assert is a library for generating detailed error messages for assertions.
+    * In case of failure, show with detail what went wrong and where, printing the values of all variables involved in the assertion.
+
+---
+
+## Reducing boilerplate a compiler plugin
+
+The compiler plugin automatically injects calls to the alignment and projection functions where needed,
+so that the designer can write in "normal Kotlin", letting the magic happen in the background:
+
+### Complete and transparent alignment via compiler plugin
+
+```kotlin
+fun <ID: Any> Aggregate<ID>.distanceTo(source: Boolean, metric: Field<ID, Double>) =
+    share(Double.POSITIVE_INFINITY) { distances ->
+        val throughNeighbor = distances.alignedMapValues(metric, Double::plus)
+        if (source) 0.0 else throughNeighbor
+    }
+}
+```
+---
+
+## Bonus: static analyzer via frontend compiler plugin
+
+An added benefit of approaching alignment via a compiler plugin is that we can
+*statically analyze* the code to provide hints. For instance, consider:
+
+```kotlin
+fun <ID : Any> Aggregate<ID>.distanceTo(source: Boolean, metric: Field<ID, Double>) =
+    evolve(Double.POSITIVE_INFINITY) {
+        val throughNeighbor = (neighboring(it) + metric).minValue(base = Double.POSITIVE_INFINITY)
+        if (source) 0.0 else throughNeighbor
+    }
+```
+
+It is a valid but *inefficient* implementation of Bellman-Ford (can you tell why?)
+
+The compiler plugin can *detect the suboptimal pattern* and provide hints:
+
+![](idea-pre-warning.png)
+
+![](idea-warning.png)
+
+---
+
 * gradle plugin
 * collektivize
 * standard library
