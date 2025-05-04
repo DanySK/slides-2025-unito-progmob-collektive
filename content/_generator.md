@@ -319,7 +319,7 @@ Different frameworks make different choices:
 
 ## Why Collektive
 
-<img src="https://github.com/Collektive/collektive/raw/master/site/static/img/collektive-logo.svg" width="300px">
+<img src="https://github.com/Collektive/collektive/raw/master/site/static/img/collektive-logo-white-background-round.svg" width="300px">
 
 Collekive answers the question:
 
@@ -389,7 +389,47 @@ fun <ID: Any> Aggregate<ID>.distanceTo(source: Boolean, metric: Field<ID, Double
 
 ### Adaptive Channel
 
-TODO
+#### Broadcast
+
+```kotlin
+// Utility class, we can use Kotlin data types freely
+data class DistanceValue<T>(val distance: Double, val value: T) : Comparable<DistanceValue<T>> {
+    operator fun plus(distance: Double): DistanceValue<T> = DistanceValue(this.distance + distance, value)
+    override fun compareTo(other: DistanceValue<T>): Int = distance.compareTo(other.distance)
+    override fun toString(): String = "$value@$distance"
+}
+
+// Simple broadcast implementation
+inline fun <ID: Any, reified T> Aggregate<ID>.broadcast(source: Boolean, value: T): T {
+    val top = DistanceValue(infinity, value)
+    val myDistanceValue = share(top) { distancesToValues ->
+        val closest = distancesToValues.minValue() ?: top
+        if (source) DistanceValue(0.0, value) else closest + 1.0
+    }
+    return myDistanceValue.value
+}
+```
+
+#### Distance between two sources
+
+```kotlin
+fun <ID: Any> Aggregate<ID>.distance(source: Boolean, destination: Boolean, metric: Field<ID, Double>) = broadcast(source, distanceTo(destination, metric))
+```
+
+#### Channel
+
+```kotlin
+fun <ID: Any> Aggregate<ID>.channel(source: Boolean, destination: Boolean, width: Double, metric: Field<ID, Double>): Boolean =
+    distanceTo(source, metric) + distanceTo(destination, metric) < distance(source, destination, metric) + width
+```
+
+#### Channel around obstacles
+
+```kotlin
+// Short-circuiting boolean operations work as branches!
+fun <ID: Any> Aggregate<ID>.channelAroundObstacles(isObstacle: Boolean, source: Boolean, destination: Boolean, width: Double, metric: Field<ID, Double>): Boolean =
+    !isObstacle && channel(source, destination, width, metric)
+```
 
 ---
 
@@ -533,11 +573,12 @@ fun <ID: Any> Aggregate<ID>.distanceTo(source: Boolean, metric: Field<ID, Double
 Performing alignment and projection manually is akin to managing memory manually in pure C:
 exposes a *low-level mechanism* and is *very error-prone*.
 
+* **Alternative**: never reify fields, create contexts in which operations are aligned (Scafi2)
 * **Observation**: alignment and projections can be *automatically inferred* from the code structure!
 
 ---
 
-## Reducing boilerplate a compiler plugin
+## Reducing boilerplate through a compiler plugin
 
 ### Kotlin: compiler plugins
 
@@ -565,7 +606,7 @@ The Kotlin compiler is designed to be extended via *compiler plugins*.
 
 ---
 
-## Reducing boilerplate a compiler plugin
+## Reducing boilerplate through a compiler plugin
 
 The compiler plugin automatically injects calls to the alignment and projection functions where needed,
 so that the designer can write in "normal Kotlin", letting the magic happen in the background:
@@ -582,10 +623,12 @@ fun <ID: Any> Aggregate<ID>.distanceTo(source: Boolean, metric: Field<ID, Double
 ```
 ---
 
-## Bonus: static analyzer via frontend compiler plugin
+## Reducing boilerplate through a compiler plugin
 
-An added benefit of approaching alignment via a compiler plugin is that we can
-*statically analyze* the code to provide hints. For instance, consider:
+### Bonus: static analyzer via frontend compiler plugin
+
+We can write our compiler plugin to
+*statically analyze* the code and    provide hints. For instance, consider:
 
 ```kotlin
 fun <ID : Any> Aggregate<ID>.distanceTo(source: Boolean, metric: Field<ID, Double>) =
@@ -595,9 +638,8 @@ fun <ID : Any> Aggregate<ID>.distanceTo(source: Boolean, metric: Field<ID, Doubl
     }
 ```
 
-It is a valid but *inefficient* implementation of Bellman-Ford (can you tell why?)
-
-The compiler plugin can *detect the suboptimal pattern* and provide hints:
+* It is a valid but *inefficient* implementation of Bellman-Ford (can you tell why?)
+* The compiler plugin can *detect the suboptimal pattern* and provide hints:
 
 ![](idea-pre-warning.png)
 
@@ -605,8 +647,98 @@ The compiler plugin can *detect the suboptimal pattern* and provide hints:
 
 ---
 
-* gradle plugin
+## Applying the compiler plugin
+
+Kotlin is typically compiled with [Gradle](https://gradle.org/), a build system that supports Kotlin natively.
+
+The Collektive Kotlin compiler plugin needs to needs to get applied to the Kotlin compilation process for aggregate code to be generated.
+
+The standard way is to build a Gradle plugin that under the hood applies the Kotlin compiler plugin.
+
+Declaring the plugin in the `plugins` block applies Collektive to the project:
+
+```kotlin
+plugins {
+    kotlin("jvm") // Or kotlin("multiplatform")
+    id("it.unibo.collektive.collektive-plugin") version "<collektive version>"
+}
+```
+
+---
+
+## Importing the DSL
+
+Once the plugin is applied, we need to import the Collektive DSL to write aggregate code.
+
+```kotlin
+dependencies {
+    implementation("it.unibo.collektive:collektive-dsl:<collektive version>")
+}
+```
+
+In multiplatform projects:
+
+```kotlin
+kotlin {
+    sourceSets {
+        val commonMain by getting {
+            dependencies {
+                implementation("it.unibo.collektive:collektive-dsl:<collektive version>")
+            }
+        }
+    }
+}
+```
+
+You are ready! Code using Aggregate contexts will get aligned and projected automatically by the compiler plugin.
+
+---
+
+## Standard library
+
+The DSL module contains the bare minimum to write aggregate code.
+
+When creating richer applications, a standard library is needed to provide common operations.
+
+The standard library in collektive is built on top of the DSL module and provides:
+* functions to reduce fields to values
+* functions to combine fields with other fields or scalars
+* functions to propagate information
+* functions to accumulate information
+* functions to break the network symmetry (e.g., performing leader election)
+
+The standard library can be imported in the same way as the DSL module:
+
+```kotlin
+dependencies {
+    implementation("it.unibo.collektive:collektive-dsl:<collektive version>")
+    implementation("it.unibo.collektive:collektive-stdlib:<collektive version>")
+}
+```
+
+In multiplatform projects:
+
+```kotlin
+kotlin {
+    sourceSets {
+        val commonMain by getting {
+            dependencies {
+                implementation("it.unibo.collektive:collektive-dsl:<collektive version>")
+                implementation("it.unibo.collektive:collektive-stdlib:<collektive version>")
+            }
+        }
+    }
+}
+```
+---
+
+## Collektivize
+
+<img src="https://github.com/Collektive/collektive/raw/master/site/static/img/collektivize-logo.svg" width="300px">
+
 * collektivize
+
+
 * standard library
 
 ---
