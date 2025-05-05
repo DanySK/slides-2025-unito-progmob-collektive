@@ -736,14 +736,114 @@ kotlin {
 
 <img src="https://github.com/Collektive/collektive/raw/master/site/static/img/collektivize-logo.svg" width="300px">
 
-* collektivize
+Collektivize (logo is temporary) is a Gradle plugin that *generates "fielded" methods* automatically.
 
+When using aggregate programming,
+we would like to manipulate fields and other data structures as if they were "scalars".
 
-* standard library
+```kotlin
+val x: Field<*, Double> = TODO()
+val y: Field<*, Double> = TODO()
+x.alignedMapValues(y) { a, b -> a + b } // Verbose!
+x + y // Shorter and more readable!
+x.mapValues { it * 3 } // Verbose!
+x * 3 // Shorter and more readable!
+neighboring(File(TODO()).readText()).map { it.lines().first() } // Verbose!
+neighboring(File(TODO()).readText()).first()
+```
+
+Collektivize runs through existing Kotlin code and generates the "fielded" methods automatically.
+The project is still experimental, but we currently use it to generate fielded methods for primitives.
 
 ---
 
 # Collektive: prototypation
+
+---
+
+## We need simulation
+
+When developing classic software systems, we use tests and debuggers to guide us through the development process
+and to verify the correctness of our code.
+
+Typically:
+1. Define the abstractions
+2. Prepare the test plan (assuming *Test Driven Development--TDD*)
+3. Design & Implement
+
+* When writing aggregate code, testing means *simulating* the system.
+    * (well, technically, also testing non-aggregate code requires simulation, but the simulator is the PC in which the code runs)
+* Running on the local device alone is a *trivial case* that won't intercept most of the issues that may arise
+    when running on a real network.
+
+### Simulation in the aggregate software development process
+
+Simulation is a fundamental part of the aggregate software development process, and it is used in several ways:
+* When **building a prototype**, to quickly assess the collektive behavior of a network
+* When **testing** the code, and especially in *regression tests*, to verify that the code works as expected
+* When **debugging**, to replicate the behavior of a system across multiple runs
+* When **profiling** the code, to understand the performance of the system
+
+
+---
+
+## Simulators for aggregate programming
+
+There are two macro-categories of simulators for aggregate programming:
+
+* **Internal simulators**: 
+    * The simulator is bundled with the aggregate programming language distribution
+    * *Pro*: dedicated simulator
+    * *Pro*: optimizable and generally high-performing
+    * **Con**: not portable across different implementations of the field calculus
+    * **Con**: high maintenance cost
+    * **Con**: generally feature-limited (a consequence of the previous point)
+* **External simulators**: 
+    * The simulator is a separate software that can run aggregate code
+    * *Pro*: separation between the tools, hence only the "glue" connecting the tools needs to be maintained
+    * *Pro*: potentially portable to multiple implementations of the field calculus
+    * *Pro*: typically feature-rich
+    * **Con**: non-dedicated, so some features may be tricky to implement
+    * **Con**: general-purpose: some optimizations may not be possible
+
+Often, languages have both, with the internal simulator often used for testing and, at most, prototypation.
+
+---
+
+## Simulators for aggregate programming
+### Examples
+
+* **MIT Proto**: built-in internal simulator only
+* **Protelis**: Uses [Alchemist](https://alchemistsimulator.github.io/) both for testing (using an old version) and for prototypation (using the latest version)
+* **ScaFi**: dedicated Scala simulator for testing and for the web version, integration with [Alchemist](https://alchemistsimulator.github.io/) for prototypation and debugging
+* **FCPP**: internal simulator for testing and prototypation, integration with [Gazebo](http://gazebosim.org/) for robotics scenarios
+* **Collektive**: minimal internal simulator for internal testing only, integration with [Alchemist](https://alchemistsimulator.github.io/) for prototypation and debugging
+
+---
+
+## Simulators for aggregate programming
+### [Alchemist](https://alchemistsimulator.github.io/)
+
+<video loop="" playsinline="" autoplay="" muted="" style="max-width: 100%; display: inline-block; ">
+  <source src="https://alchemistsimulator.github.io/home-animation.mp4" type="video/mp4">
+  If your browser supported the video tag, there would be a nice video.
+</video>
+
+Alchemist is a general-purpose simulator for networked systems.
+* Relatively simple environment with nodes and links
+* Supports maps and floor plans (in image form)
+* Support for simulating networks of tuple spaces (its initial goal in 2011)
+* Support for biological multi-cellular simulations (cellular sizes, membranes, molecular channels...)
+* Support for *Protelis* and *ScaFi*
+* *Collektive* features an integration that will be moved to Alchemist once stable
+
+---
+
+## Simulators for aggregate programming
+
+### How to be a good engineer
+
+
 
 ---
 
