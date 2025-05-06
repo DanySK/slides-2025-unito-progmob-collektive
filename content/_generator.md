@@ -276,7 +276,7 @@ DEF() double abf(ARGS, bool source) { CODE
 
 but they also have some critical issues:
 * Their *syntax is restricted* to valid fragments in the host language
-* Language-level mechanisms, such as **alignment**, may "boil" up to the surface, making the language pleasant
+* Language-level mechanisms, such as **alignment**, may "boil" up to the surface, making the language unpleasant
     * and *violating information hiding*
 
 ---
