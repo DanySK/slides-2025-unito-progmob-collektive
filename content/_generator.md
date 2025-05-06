@@ -36,7 +36,7 @@ aliases = [
   * the topology *changes dynamically*
 * Devices are possibly *situated*
 * Possibly multiple network technologies to be used opportunistically
-  * (e.g., bluetooth, wifi, 5g, etc.)
+  * (e.g., Bluetooth, Wi-Fi, 5G, etc.)
   
 {{% /col %}}{{% /multicol %}}
 
@@ -52,7 +52,7 @@ aliases = [
 One way to tackle these challenges is through systems that *self-organise*.
 
 * *Self-organisation* is a process in which a system spontaneously organizes itself into a structured state without external control.
-* It is a **bottom-up** process, where local interactions between components lead to the **emergence** of global patterns or structures.
+* It is a **bottom-up** process in which local interactions among components lead to the **emergence** of global patterns or structures.
 * Self-organisation is often observed in *natural systems*, such as biological organisms, ecosystems, and social systems.
 * It can also be applied to artificial systems, such as robotics, distributed computing, and complex networks.
 
@@ -90,7 +90,7 @@ allowfullscreen>
 
 * Self-organisation is **very hard to engineer**
 * The system properties are built **bottom-up** from **local interactions**
-* Even worse, even when a self-org system has been built and verified,
+* Even worse, even when a self-organizing system has been built and verified,
 it is extremely hard to **reuse** it in a different context
 
 ### Where is the *engineering*?
@@ -116,7 +116,7 @@ that allow us to build self-organising systems?
 ### Aggregate programming, originally:
 
 * The computational machine is the entire system
-* Data items are a *fields*
+* Data items are *fields*
     * A map from *devices* to *values*
 * Basic operations:
     * evolution in time: `rep`
@@ -134,7 +134,7 @@ that allow us to build self-organising systems?
 ![MIT Proto](https://raw.githubusercontent.com/jakebeal/MIT-Proto/refs/heads/master/webproto/figures/protorunning.png)
 
 The precursor of aggregate programming,
-based on the idea of *amorphus computing*.
+based on the idea of *amorphous computing*.
 
 * Originally developed at the MIT by Jonathan Bachrach and Jake Beal
 * C++ with built-in OpenGL visualisation
@@ -300,7 +300,7 @@ branching must break alignment
 ## Alignment when programming
 
 * Alignment is a **low-level mechanism** and as such should be **hidden** when writing aggregate code
-    * Just as memory references are hidden when you program in Kotlin or Java
+    * Just as memory references are abstracted away when programming in Kotlin or Java
 * Implementing alignment requires maintaining your own stack, so that when a communication act happens
 the information can be associated to the stack frame
 
@@ -321,7 +321,7 @@ Different frameworks make different choices:
 
 <img src="https://github.com/Collektive/collektive/raw/master/site/static/img/collektive-logo-white-background-round.svg" width="300px">
 
-Collekive answers the question:
+Collektive answers the question:
 
 > what if we modify the host language compiler to align code strongly and transparently?
 
@@ -570,7 +570,7 @@ fun <ID: Any> Aggregate<ID>.distanceTo(source: Boolean, metric: Field<ID, Double
 }
 ```
 
-Performing alignment and projection manually is akin to managing memory manually in pure C:
+Manually handling alignment and projection is akin to manual memory management in pure C:
 exposes a *low-level mechanism* and is *very error-prone*.
 
 * **Alternative**: never reify fields, create contexts in which operations are aligned (Scafi2)
@@ -651,7 +651,7 @@ fun <ID : Any> Aggregate<ID>.distanceTo(source: Boolean, metric: Field<ID, Doubl
 
 Kotlin is typically compiled with [Gradle](https://gradle.org/), a build system that supports Kotlin natively.
 
-The Collektive Kotlin compiler plugin needs to needs to get applied to the Kotlin compilation process for aggregate code to be generated.
+The Collektive Kotlin compiler plugin needs to be applied to the Kotlin compilation process for aggregate code to be generated.
 
 The standard way is to build a Gradle plugin that under the hood applies the Kotlin compiler plugin.
 
