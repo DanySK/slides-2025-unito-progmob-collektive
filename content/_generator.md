@@ -921,7 +921,51 @@ We can play with it!
 
 ---
 
-## Collektive network structure
+## Collektive entrypoint
+
+* Collektive logical devices can be created, provided a `Mailbox`, a local identifier, (optionally) a `SerializationFactory`,
+and the program
+* The logical device can run a cycle whenever asked to
+
+```kotlin
+val myAggregateDevice = Collektive(myId, myMailbox) { // Here the aggregate context is available!
+    val myMetric = neighboring(gpsPosition()).mapValues { it.distanceTo(gpsPosition()) }
+    myAggregateFunction(myMetric)
+}
+myAggregateDevice.cycle() // Runs the cycle
+```
+
+* The execution returns the value computed by the provided program:
+
+```kotlin
+val myAggregateDevice = Collektive(myId, myMailbox) { 1 }
+val roundResult: Int = myAggregateDevice.cycle()
+```
+
+---
+
+## Collektive on Android
+
+We prepared a template project for Collektive on Android: https://github.com/Collektive/collektive-example-android-bt
+
+* Searches for neighboring devices using Bluetooth
+* Exchanges messages via MQTT (using [Mktt](https://github.com/nicolasfara/mktt))
+* Uses Compose for the UI
+* The entrypoint and the core of the application is:
+
+```kotlin
+@RequiresPermission(allOf = [Manifest.permission.BLUETOOTH_ADVERTISE, Manifest.permission.BLUETOOTH_SCAN])
+private suspend fun collektiveProgram(): Collektive<Uuid, Set<Uuid>> {
+    val mailbox =
+        MqttMailbox(deviceId, "broker.hivemq.com", dispatcher = dispatcher, context = getApplication())
+    return Collektive(deviceId, mailbox) {
+        neighboring(localId).neighbors.toSet()
+    }
+}
+```
+
+Use this example to create your Android Aggregate applications!
+
 
 ---
 
