@@ -255,7 +255,7 @@ DEF() double abf(ARGS, bool source) { CODE
 | JVM compatibility     | {{< tick >}}  | {{< tick >}}  | {{< cross >}} |
 | Android compatibility | ~             | ~             | {{< cross >}} |
 | JS compatibility      | {{< cross >}} | {{< tick >}}  | {{< cross >}} |
-| Native compatibility  | {{< cross >}} | {{< cross >}} | {{< tick >}}  |
+| Native compatibility  | {{< cross >}} | ~             | {{< tick >}}  |
 | iOS compatibility     | {{< cross >}} | {{< cross >}} | {{< cross >}} |
 | Strictly typed        | {{< cross >}} | {{< tick >}}  | {{< tick >}}  |
 | Transparent alignment | {{< tick >}}  | {{< cross >}} | {{< cross >}} |
@@ -824,7 +824,9 @@ Often, languages have both, with the internal simulator often used for testing a
 ## Simulators for aggregate programming
 ### [Alchemist](https://alchemistsimulator.github.io/)
 
-<video loop="" playsinline="" autoplay="" muted="" style="max-width: 100%; display: inline-block; ">
+https://alchemistsimulator.github.io/
+
+<video loop="" playsinline="" autoplay="" muted="" style="max-width: 800px; display: inline-block; ">
   <source src="https://alchemistsimulator.github.io/home-animation.mp4" type="video/mp4">
   If your browser supported the video tag, there would be a nice video.
 </video>
@@ -891,8 +893,8 @@ We can play with it!
 
 ### Cluster-based multi hop data transmission in maritime environments 
  
-* TODO!
-* run with `TODO`
+* https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm
+* run with `./gradlew runAllGraphic`
 
 ---
 
@@ -900,8 +902,26 @@ We can play with it!
 
 ---
 
-* Network model
-* Android example
+## Collektive network structure
+
+![](network.svg)
+
+* [`Message`](https://javadoc.io/doc/it.unibo.collektive/collektive-dsl/24.0.3/collektive-dsl/it.unibo.collektive.networking/-message/index.html) (pre-implemented) carries a payload. Can be
+    [serialized](https://javadoc.io/doc/it.unibo.collektive/collektive-dsl/24.0.3/collektive-dsl/it.unibo.collektive.networking/-serialized-message/index.html) or
+    [in-memory](https://javadoc.io/doc/it.unibo.collektive/collektive-dsl/24.0.3/collektive-dsl/it.unibo.collektive.networking/-in-memory-message/index.html) (for simulations). 
+* [`OutboundEnvelope`](https://javadoc.io/doc/it.unibo.collektive/collektive-dsl/24.0.3/collektive-dsl/it.unibo.collektive.networking/-outbound-envelope/index.html) (pre-implemented),
+    can [prepare messages for delivery to a specific neighbor](https://javadoc.io/static/it.unibo.collektive/collektive-dsl/24.0.3/collektive-dsl/it.unibo.collektive.networking/-outbound-envelope/prepare-message-for.html)
+* [`Mailbox`](https://javadoc.io/doc/it.unibo.collektive/collektive-dsl/24.0.3/collektive-dsl/it.unibo.collektive.networking/-mailbox/index.html) -- platform-specific implementation!
+    * provides the [`NeighborsData` with messages that are currently valid](https://javadoc.io/static/it.unibo.collektive/collektive-dsl/24.0.3/collektive-dsl/it.unibo.collektive.networking/-mailbox/current-inbound.html)
+    * produces the [`Message` for a specific neighbor](https://javadoc.io/static/it.unibo.collektive/collektive-dsl/24.0.3/collektive-dsl/it.unibo.collektive.networking/-mailbox/deliverable-for.html)
+    * must be [notified is a new message arrives](https://javadoc.io/static/it.unibo.collektive/collektive-dsl/24.0.3/collektive-dsl/it.unibo.collektive.networking/-mailbox/deliverable-received.html)
+* [`NeighborsData`](https://javadoc.io/doc/it.unibo.collektive/collektive-dsl/24.0.3/collektive-dsl/it.unibo.collektive.networking/-neighbors-data/index.html) -- typically implemented on the fly as an anonymous `object` inside the `Mailbox` implementation
+    * Produced by the `Mailbox`
+    * provides [access to the values neighbors produced at specific points in code](https://javadoc.io/doc/it.unibo.collektive/collektive-dsl/24.0.3/collektive-dsl/it.unibo.collektive.networking/-neighbors-data/data-at.html)
+
+---
+
+## Collektive network structure
 
 ---
 
