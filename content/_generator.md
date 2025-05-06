@@ -498,12 +498,12 @@ Collektive introduces the following important abstractions:
 Collektive is designed for the aggregate code to meld into Kotlin natively.
 Names have been selected favoring a Kotlin-friendly syntax instead of the literature terms.
 
-| **Literature**   | **Collektive** |
-|------------------|----------------|
-| `rep`            | `evolve`       |
-| `nbr`            | `neighboring`  |
-| `share`          | `share`        |
-| `xc`             | `exchange`     |
+| **Literature** | **Collektive** |
+|----------------|----------------|
+| `rep`          | `evolve`       |
+| `nbr`          | `neighboring`  |
+| `share`        | `share`        |
+| `exchange`     | `exchange`     |
 
 All computations use Kotlin's native types.
 * With one caveat: types used in aggregate operations must be `@Serializable`
@@ -522,7 +522,7 @@ There is a missing item in the previous table:
 | `rep`          | `evolve`       |
 | `nbr`          | `neighboring`  |
 | `share`        | `share`        |
-| `xc`           | `exchange`     |
+| `exchange`     | `exchange`     |
 | `if`           | ????           |
 
 Branching in aggregate programming is *domain segmentation*: operations inside a branch are *aligned*
