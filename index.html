@@ -260,8 +260,7 @@ based on the idea of <em>amorphus computing</em>.</p>
           <td>Native compatibility</td>
           <td><i class="fa-solid fa-xmark" style="color: red;"></i>
 </td>
-          <td><i class="fa-solid fa-xmark" style="color: red;"></i>
-</td>
+          <td>~</td>
           <td><i class="fa-solid fa-check" style="color: green;"></i>
 </td>
       </tr>
@@ -997,7 +996,8 @@ when running on a real network.</li>
 </section><section>
 <h2 id="simulators-for-aggregate-programming-2">Simulators for aggregate programming</h2>
 <h3 id="alchemist"><a href="https://alchemistsimulator.github.io/">Alchemist</a></h3>
-<video loop="" playsinline="" autoplay="" muted="" style="max-width: 100%; display: inline-block; ">
+<p><a href="https://alchemistsimulator.github.io/">https://alchemistsimulator.github.io/</a></p>
+<video loop="" playsinline="" autoplay="" muted="" style="max-width: 800px; display: inline-block; ">
   <source src="https://alchemistsimulator.github.io/home-animation.mp4" type="video/mp4">
   If your browser supported the video tag, there would be a nice video.
 </video>
@@ -1071,16 +1071,36 @@ when running on a real network.</li>
 </ul>
 <h3 id="cluster-based-multi-hop-data-transmission-in-maritime-environments">Cluster-based multi hop data transmission in maritime environments</h3>
 <ul>
-<li>TODO!</li>
-<li>run with <code>TODO</code></li>
+<li><a href="https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm">https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm</a></li>
+<li>run with <code>./gradlew runAllGraphic</code></li>
 </ul>
 </section><section>
 <h1 id="collektive-on-real-world-devices">Collektive on real world devices</h1>
 </section><section>
+<h2 id="collektive-network-structure">Collektive network structure</h2>
+<p><img src="network.svg" alt=""></p>
 <ul>
-<li>Network model</li>
-<li>Android example</li>
+<li><a href="https://javadoc.io/doc/it.unibo.collektive/collektive-dsl/24.0.3/collektive-dsl/it.unibo.collektive.networking/-message/index.html"><code>Message</code></a> (pre-implemented) carries a payload. Can be
+<a href="https://javadoc.io/doc/it.unibo.collektive/collektive-dsl/24.0.3/collektive-dsl/it.unibo.collektive.networking/-serialized-message/index.html">serialized</a> or
+<a href="https://javadoc.io/doc/it.unibo.collektive/collektive-dsl/24.0.3/collektive-dsl/it.unibo.collektive.networking/-in-memory-message/index.html">in-memory</a> (for simulations).</li>
+<li><a href="https://javadoc.io/doc/it.unibo.collektive/collektive-dsl/24.0.3/collektive-dsl/it.unibo.collektive.networking/-outbound-envelope/index.html"><code>OutboundEnvelope</code></a> (pre-implemented),
+can <a href="https://javadoc.io/static/it.unibo.collektive/collektive-dsl/24.0.3/collektive-dsl/it.unibo.collektive.networking/-outbound-envelope/prepare-message-for.html">prepare messages for delivery to a specific neighbor</a></li>
+<li><a href="https://javadoc.io/doc/it.unibo.collektive/collektive-dsl/24.0.3/collektive-dsl/it.unibo.collektive.networking/-mailbox/index.html"><code>Mailbox</code></a> – platform-specific implementation!
+<ul>
+<li>provides the <a href="https://javadoc.io/static/it.unibo.collektive/collektive-dsl/24.0.3/collektive-dsl/it.unibo.collektive.networking/-mailbox/current-inbound.html"><code>NeighborsData</code> with messages that are currently valid</a></li>
+<li>produces the <a href="https://javadoc.io/static/it.unibo.collektive/collektive-dsl/24.0.3/collektive-dsl/it.unibo.collektive.networking/-mailbox/deliverable-for.html"><code>Message</code> for a specific neighbor</a></li>
+<li>must be <a href="https://javadoc.io/static/it.unibo.collektive/collektive-dsl/24.0.3/collektive-dsl/it.unibo.collektive.networking/-mailbox/deliverable-received.html">notified is a new message arrives</a></li>
 </ul>
+</li>
+<li><a href="https://javadoc.io/doc/it.unibo.collektive/collektive-dsl/24.0.3/collektive-dsl/it.unibo.collektive.networking/-neighbors-data/index.html"><code>NeighborsData</code></a> – typically implemented on the fly as an anonymous <code>object</code> inside the <code>Mailbox</code> implementation
+<ul>
+<li>Produced by the <code>Mailbox</code></li>
+<li>provides <a href="https://javadoc.io/doc/it.unibo.collektive/collektive-dsl/24.0.3/collektive-dsl/it.unibo.collektive.networking/-neighbors-data/data-at.html">access to the values neighbors produced at specific points in code</a></li>
+</ul>
+</li>
+</ul>
+</section><section>
+<h2 id="collektive-network-structure-1">Collektive network structure</h2>
 </section><section>
 <h1 id="collektive-aggregate-programming-in-kotlin-multiplatform-1">Collektive: Aggregate programming in Kotlin Multiplatform</h1>
 <h3 id="danilo-pianini-1"><a href="mailto:danilo.pianini@unibo.it">Danilo Pianini — danilo.pianini@unibo.it</a></h3>
