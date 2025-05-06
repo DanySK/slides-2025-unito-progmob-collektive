@@ -976,5 +976,3 @@ Use this example to create your Android Aggregate applications!
 #### Seminar in "Programmazione di Sistemi Mobile" @ Università di Torino
 
 [start over](#0)
-
----
