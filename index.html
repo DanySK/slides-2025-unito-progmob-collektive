@@ -49,7 +49,7 @@
 <li>Devices are possibly <em>situated</em></li>
 <li>Possibly multiple network technologies to be used opportunistically
 <ul>
-<li>(e.g., bluetooth, wifi, 5g, etc.)</li>
+<li>(e.g., Bluetooth, Wi-Fi, 5G, etc.)</li>
 </ul>
 </li>
 </ul>
@@ -62,7 +62,7 @@
 <p>One way to tackle these challenges is through systems that <em>self-organise</em>.</p>
 <ul>
 <li><em>Self-organisation</em> is a process in which a system spontaneously organizes itself into a structured state without external control.</li>
-<li>It is a <strong>bottom-up</strong> process, where local interactions between components lead to the <strong>emergence</strong> of global patterns or structures.</li>
+<li>It is a <strong>bottom-up</strong> process in which local interactions among components lead to the <strong>emergence</strong> of global patterns or structures.</li>
 <li>Self-organisation is often observed in <em>natural systems</em>, such as biological organisms, ecosystems, and social systems.</li>
 <li>It can also be applied to artificial systems, such as robotics, distributed computing, and complex networks.</li>
 </ul>
@@ -87,7 +87,7 @@
 <ul>
 <li>Self-organisation is <strong>very hard to engineer</strong></li>
 <li>The system properties are built <strong>bottom-up</strong> from <strong>local interactions</strong></li>
-<li>Even worse, even when a self-org system has been built and verified,
+<li>Even worse, even when a self-organizing system has been built and verified,
 it is extremely hard to <strong>reuse</strong> it in a different context</li>
 </ul>
 <h3 id="where-is-the-engineering">Where is the <em>engineering</em>?</h3>
@@ -109,7 +109,7 @@ that allow us to build self-organising systems?</p>
 <h3 id="aggregate-programming-originally">Aggregate programming, originally:</h3>
 <ul>
 <li>The computational machine is the entire system</li>
-<li>Data items are a <em>fields</em>
+<li>Data items are <em>fields</em>
 <ul>
 <li>A map from <em>devices</em> to <em>values</em></li>
 </ul>
@@ -128,7 +128,7 @@ that allow us to build self-organising systems?</p>
 <h2 id="mit-proto-2006">MIT Proto, 2006</h2>
 <p><img src="https://raw.githubusercontent.com/jakebeal/MIT-Proto/refs/heads/master/webproto/figures/protorunning.png" alt="MIT Proto"></p>
 <p>The precursor of aggregate programming,
-based on the idea of <em>amorphus computing</em>.</p>
+based on the idea of <em>amorphous computing</em>.</p>
 <ul>
 <li>Originally developed at the MIT by Jonathan Bachrach and Jake Beal</li>
 <li>C++ with built-in OpenGL visualisation</li>
@@ -353,7 +353,7 @@ based on the idea of <em>amorphus computing</em>.</p>
 <ul>
 <li>Alignment is a <strong>low-level mechanism</strong> and as such should be <strong>hidden</strong> when writing aggregate code
 <ul>
-<li>Just as memory references are hidden when you program in Kotlin or Java</li>
+<li>Just as memory references are abstracted away when programming in Kotlin or Java</li>
 </ul>
 </li>
 <li>Implementing alignment requires maintaining your own stack, so that when a communication act happens
@@ -383,7 +383,7 @@ but there is no way to have a <code>Field</code>-typed object</li>
 </section><section>
 <h2 id="why-collektive">Why Collektive</h2>
 <img src="https://github.com/Collektive/collektive/raw/master/site/static/img/collektive-logo-white-background-round.svg" width="300px">
-<p>Collekive answers the question:</p>
+<p>Collektive answers the question:</p>
 <blockquote>
 <p>what if we modify the host language compiler to align code strongly and transparently?</p></blockquote>
 <p>Collektive used Kotlin to do so as:</p>
@@ -788,7 +788,7 @@ only with the devices that are in the same branch.</p>
 </span></span><span style="display:flex;"><span>            <span style="color:#000;font-weight:bold">}</span>
 </span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">}</span>
 </span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
-</span></span></code></pre></div><p>Performing alignment and projection manually is akin to managing memory manually in pure C:
+</span></span></code></pre></div><p>Manually handling alignment and projection is akin to manual memory management in pure C:
 exposes a <em>low-level mechanism</em> and is <em>very error-prone</em>.</p>
 <ul>
 <li><strong>Alternative</strong>: never reify fields, create contexts in which operations are aligned (Scafi2)</li>
@@ -860,7 +860,7 @@ so that the designer can write in “normal Kotlin”, letting the magic happen 
 </section><section>
 <h2 id="applying-the-compiler-plugin">Applying the compiler plugin</h2>
 <p>Kotlin is typically compiled with <a href="https://gradle.org/">Gradle</a>, a build system that supports Kotlin natively.</p>
-<p>The Collektive Kotlin compiler plugin needs to needs to get applied to the Kotlin compilation process for aggregate code to be generated.</p>
+<p>The Collektive Kotlin compiler plugin needs to be applied to the Kotlin compilation process for aggregate code to be generated.</p>
 <p>The standard way is to build a Gradle plugin that under the hood applies the Kotlin compiler plugin.</p>
 <p>Declaring the plugin in the <code>plugins</code> block applies Collektive to the project:</p>
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="nohighlight" data-noescape=""><span style="display:flex;"><span><span style="color:#000">plugins</span> <span style="color:#000;font-weight:bold">{</span>
