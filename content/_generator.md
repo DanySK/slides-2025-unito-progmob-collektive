@@ -253,7 +253,7 @@ DEF() double abf(ARGS, bool source) { CODE
 | Properties            | Protelis      | ScaFi         | FCPP          |
 |-----------------------|---------------|---------------|---------------|
 | JVM compatibility     | {{< tick >}}  | {{< tick >}}  | {{< cross >}} |
-| Android compatibility | ~             | ~             | {{< cross >}} |
+| Android compatibility | ~             | ~             | ~             |
 | JS compatibility      | {{< cross >}} | {{< tick >}}  | {{< cross >}} |
 | Native compatibility  | {{< cross >}} | ~             | {{< tick >}}  |
 | iOS compatibility     | {{< cross >}} | {{< cross >}} | {{< cross >}} |
